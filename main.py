@@ -28,8 +28,8 @@ class MagicToggleGame():
 		self.boardList = list()
 		self.x = 0
 		self.y = 0
-		self.x_cp = 5
-		self.y_cp = 5
+		self.x_cp = 1
+		self.y_cp = 1
 
 		self.lastX = -1
 		self.lastY = -1
@@ -38,6 +38,9 @@ class MagicToggleGame():
 		self.last_turn_score = 0
 		self.fast_or_not = 0
 		self.game_level = 2
+
+		self.analysis_finished = 1
+
 	def InitBoard(self):
 		x = int(raw_input("enter x size: "))
 		y = int(raw_input("enter y size: "))
@@ -55,6 +58,8 @@ class MagicToggleGame():
 		self.boardList[y/2][x/2-1] = 2
 		self.boardList[y/2-1][x/2-1] = 1
 		self.boardList[y/2-1][x/2] = 2
+		self.x_cp = x/2
+		self.y_cp = y/2+2
 	def CountObjectsOnBoard(self):
 		player1 = 0
 		player2 = 0
@@ -65,42 +70,55 @@ class MagicToggleGame():
 				if(k==2):
 					player2+=1
 		return [player1,player2]
+	def IfBoardIsFull(self):
+		full = 1
+		for i in self.boardList:
+			for k in i:
+				if(k == 0):
+					full = 0
+		return full
 	def ShowBoard(self):
+		score = [0,0]
 		sys.stdout.write("\033[37m")
 		my_curse3 = "\033[01;99m"
-		my_curse4 = "\033[01;102m"
+		my_curse4 = "\033[01;103m"
 		my_curse1 = Back.BLACK
 		my_curse0 = "\033[01;100m"
 		my_curse00 = "\033[01;47m"
-		
+		sys.stdout.write(my_curse3)
+		sys.stdout.write(my_curse1)
 		#for i in range(255):
 		#	sys.stdout.write("\033[30m\033[01;"+str(i)+"m")
 		#	sys.stdout.write(str(i)+",")
 		print("")
-		print("\n  MAGIC TOGGLE\n")
-		if(self.game_level==1):
-			print(" level - easy")
-		if(self.game_level==2):
-			print(" level - normal")
-		if(self.game_level==3):
-			print(" level - hard")
-		if(self.game_level==4):
-			print(" level - imposible")
+		print("\n\n\n\n\n\n\n\n\n\n\n\n  MAGIC TOGGLE\n")
+		if(self.gamemode == 2):
+			if(self.game_level==1):
+				print("      easy    ")
+			if(self.game_level==2):
+				print("     normal   ")
+			if(self.game_level==3):
+				print("      hard    ")
+			if(self.game_level==4):
+				print("    imposible ")
+		else:
+			print("   multiplayer")
+			
 		sys.stdout.write("\033[30m")
 		print("")
-		sys.stdout.write("  ")
-		sys.stdout.write(my_curse3)
+		
+		sys.stdout.write("   ")
+		sys.stdout.write(my_curse4)
 		for i in range(len(self.boardList)+2):
 			sys.stdout.write(" ")
 		sys.stdout.write(my_curse1)
 		print("")
-
 		c_x = 1
 		c_y = 1
 		my_bool = 0
 		for i in self.boardList:
-			sys.stdout.write("  ")
-			sys.stdout.write(my_curse3)
+			sys.stdout.write("   ")
+			sys.stdout.write(my_curse4)
 			sys.stdout.write(" ")
 			sys.stdout.write(my_curse1)
 			my_curse2 = ""
@@ -129,23 +147,33 @@ class MagicToggleGame():
 				sys.stdout.write(my_curse1)
 				c_x += 1
 			c_x = 1
-			sys.stdout.write(my_curse3)
+			sys.stdout.write(my_curse4)
 			sys.stdout.write(" ")
 			sys.stdout.write(my_curse1)
 			print("")
 			c_y += 1
-		sys.stdout.write("  ")
-		sys.stdout.write(my_curse3)
+		sys.stdout.write("   ")
+		sys.stdout.write(my_curse4)
 		for i in range(len(self.boardList)+2):
 			sys.stdout.write(" ")
 		sys.stdout.write(my_curse1)
 		sys.stdout.write("\n")
 		sys.stdout.write("\033[37m")
+		score = self.CountObjectsOnBoard()
+		if(self.IfBoardIsFull() and self.analysis_finished == 1):
+			score = self.CountObjectsOnBoard()
+			sys.stdout.write("\n")
+			if(score[0]>score[1]):
+				sys.stdout.write("\033[31m"+"   Red wins!"+"\033[37m\n")
+			if(score[0]<score[1]):
+				sys.stdout.write("\033[34m"+"   Blue wins!"+"\033[37m\n")
+			if(score[0]==score[1]):
+				sys.stdout.write(my_curse3+"   Both wins!"+"\033[37m\n")
 		#print(self.GetAllAvailablePositions())
 		#print("last turn score is "+str(self.last_turn_score))
 		score = self.CountObjectsOnBoard()
-		sys.stdout.write("\n\033[31m"+"   @: "+str(score[0])+" "+"\033[34m"+"@: "+str(score[1])+"\033[30m\n")
-		sys.stdout.write("quit by pressing ctrl + c")
+		sys.stdout.write("\n\033[31m"+"   @: "+str(score[0])+" "+"\033[34m"+"@: "+str(score[1])+"\033[37m\n")
+		#sys.stdout.write("\nquit by pressing ctrl + c")
 	def SetCurrentPos(self,player_num):
 		return self.SetPos(player_num,self.x_cp,self.y_cp)
 	def SetPos(self,player_num,x_cp,y_cp):
@@ -163,6 +191,8 @@ class MagicToggleGame():
 						self.lastPlayer = player_num
 						self.lastX = i
 						self.lastY = k
+						self.x_cp = i+1
+						self.y_cp = k+1
 						self.LastTurnSearchAndChange(player_num)
 					else:
 						return 0
@@ -302,6 +332,7 @@ class MagicToggleGame():
 			i=0
 			k+=1
 	def LastTurnSearchAndChange(self,p_n):
+		self.analysis_finished = 0
 		turn_score = 0
 		x = self.lastX
 		y = self.lastY
@@ -523,6 +554,7 @@ class MagicToggleGame():
 			if(x==self.lastX and y==self.lastY):
 				break
 		self.last_turn_score = turn_score
+		self.analysis_finished = 1
 
 	def IncCurX(self):
 		if(self.x_cp<self.x):
@@ -537,12 +569,184 @@ class MagicToggleGame():
 		if(self.y_cp>1):
 			self.y_cp-=1
 
+class GameMenu():
+	def __init__(self,parent):
+		self.parent = parent
+		self.list_of_modes = [" MULTIPLAYER ","     CPU     "]
+		self.list_of_sizes = ["      04     ","      06     ","      08     ","      10     ","      12     ","      14     ","      16     "]
+		self.list_of_levels = ["     EASY    ","    NORMAL   ","     HARD    ","  IMPOSIBLE  "]
+		self.current_index = 0
+
+		self.my_curse5 = "\033[37m"
+		self.my_curse3 = "\033[01;99m"
+		self.my_curse4 = "\033[01;103m"
+		self.my_curse1 = Back.BLACK
+		self.my_curse0 = "\033[01;100m"
+		self.my_curse00 = "\033[01;47m"
+		self.my_curse6 = "\033[105m"
+
+	def IncIndex(self,max_index):
+		if(self.current_index+1<=max_index):
+			self.current_index+=1
+	def DecIndex(self):
+		if(self.current_index-1>=0):
+			self.current_index-=1
+
+	def ShowModeMenu(self,title1,title2):
+		
+		sys.stdout.write(self.my_curse1)
+		sys.stdout.write(self.my_curse3)
+		sys.stdout.write("\033[37m")
+		self.current_index = 0
+		first_time = 1
+		key = ""
+		while True:
+			if(first_time == 0):
+				key = str(getkey())
+			else:
+				first_time = 0
+			if key == "8":
+				#print("Move up")
+				self.DecIndex()
+				first_time = 0
+			if key == "5":
+				#print("Move down")
+				
+				self.IncIndex(len(self.list_of_modes)-1)
+			sys.stdout.write(title1+"\n"+title2+"\n")
+			i = 0
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write("               ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n")
+			for item in self.list_of_modes:
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse4)
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse1)
+				if(i == self.current_index):
+					sys.stdout.write(self.my_curse6)
+				sys.stdout.write(item)
+				i+=1
+				sys.stdout.write(self.my_curse4)
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse1)
+				sys.stdout.write("\n")
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write("               ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n")
+			if key == "\n":
+				break
+			sys.stdout.write("\n\n\n\n\n")
+		return self.current_index+1
+
+	def ShowSizeMenu(self,title1,title2):
+		sys.stdout.write(self.my_curse1)
+		sys.stdout.write(self.my_curse3)
+		sys.stdout.write("\033[37m")
+		self.current_index = 0
+		first_time = 1
+		key = ""
+		while True:
+			if(first_time == 0):
+				key = str(getkey())
+			else:
+				first_time = 0
+			if key == "8":
+				#print("Move up")
+				self.DecIndex()
+			if key == "5":
+				#print("Move down")
+				self.IncIndex(len(self.list_of_sizes)-1)
+
+			sys.stdout.write(title1+"\n"+title2+"\n")
+			
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write("               ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n")
+
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write(self.my_curse6)
+			sys.stdout.write(self.list_of_sizes[self.current_index])
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n")
+
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write("               ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n")
+			if key == "\n":
+				break
+			sys.stdout.write("\n\n\n\n\n\n")
+		return self.list_of_sizes[self.current_index]
+	def ShowLevelsMenu(self,title1,title2):
+		sys.stdout.write(self.my_curse1)
+		sys.stdout.write(self.my_curse3)
+		sys.stdout.write("\033[37m")
+		self.current_index = 0
+		first_time = 1
+		key = ""
+		while True:
+			if(first_time == 0):
+				key = str(getkey())
+			else:
+				first_time = 0
+			if key == "8":
+				#print("Move up")
+				self.DecIndex()
+			if key == "5":
+				#print("Move down")
+				
+				self.IncIndex(len(self.list_of_levels)-1)
+			sys.stdout.write(title1+"\n"+title2+"\n")
+			i = 0
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write("               ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n")
+			for item in self.list_of_levels:
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse4)
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse1)
+				if(i == self.current_index):
+					sys.stdout.write(self.my_curse6)
+				
+				sys.stdout.write(item)
+				sys.stdout.write(self.my_curse4)
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse1)
+				i+=1
+				sys.stdout.write("\n")
+			if key == "\n":
+				break
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write("               ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n\n\n\n")
+		return self.current_index+1
 
 if __name__ == "__main__":
-	MyMagicToggleGame = MagicToggleGame(None)
 	
+	
+
+	
+
 	#MyMagicToggleGame.InitBoard()
-	while(1):
+	'''while(1):
 		y_size = raw_input("enter y size of the game field - min:8, max:16 - ")
 		x_size = raw_input("enter x size of the game field - min:8, max:16 - ")
 		try:
@@ -562,8 +766,28 @@ if __name__ == "__main__":
 	
 	print("\n  Game just started,\n\n controls: numpad(8,5,4,6) and \"enter\" button\n\n I hope you will enjoy!")
 	MyMagicToggleGame.gamemode = 2
+	'''
+
+	first_time = 0
+	player_switcher = 0
+	first_time = 1
+	key = "8"
+	chosen_to_be_first = 1
 	while True:
-		key = str(getkey())
+		if(first_time == 0):
+				key = str(getkey())
+		else:
+			MyGameMenu = GameMenu(None)
+			MyMagicToggleGame = MagicToggleGame(None)
+			board_size = int(MyGameMenu.ShowSizeMenu("\n\n\n\n\n\n\n\n\n\n\n\n  MAGIC TOGGLE","\n  select size\n\n"))
+			MyMagicToggleGame.SetBoard(board_size,board_size)
+			MyMagicToggleGame.gamemode = int(MyGameMenu.ShowModeMenu("\n\n\n\n\n\n\n\n\n\n\n\n  MAGIC TOGGLE","\n  select mode\n\n"))
+			if(MyMagicToggleGame.gamemode == 2):
+				MyMagicToggleGame.game_level = int(MyGameMenu.ShowLevelsMenu("\n\n\n\n\n\n\n\n\n\n\n\n  MAGIC TOGGLE","\n  select level\n\n"))
+			first_time = 0
+			player_switcher = 0
+			key = "8"
+			chosen_to_be_first = 1
 		if key == "8":
 			#print("Move up")
 			MyMagicToggleGame.DecCurY()
@@ -580,18 +804,19 @@ if __name__ == "__main__":
 			#print("Move right")
 			MyMagicToggleGame.IncCurX()
 			MyMagicToggleGame.ShowBoard()
-
+		if key == "0":
+			first_time = 1
 		if key == "\n":
-			#other
-			a = 0
-			if(MyMagicToggleGame.SetCurrentPos(1)==1):
-				if(MyMagicToggleGame.gamemode == 2):
-					MyMagicToggleGame.DoSmartTurn(2)
-				MyMagicToggleGame.ShowBoard()
-		if(MyMagicToggleGame.gamemode == 1):
-			if key == "-":
-				#other
-				a = 0
+			if(MyMagicToggleGame.gamemode == 1):
+				player_switcher = not player_switcher
+			if(MyMagicToggleGame.gamemode == 2):
+				player_switcher = chosen_to_be_first
+			if(player_switcher == 1):
+				if(MyMagicToggleGame.SetCurrentPos(1)==1):
+					if(MyMagicToggleGame.gamemode == 2):
+						MyMagicToggleGame.DoSmartTurn(2)
+					MyMagicToggleGame.ShowBoard()
+			else:
 				if(MyMagicToggleGame.SetCurrentPos(2)==1):
 					if(MyMagicToggleGame.gamemode == 2):
 						MyMagicToggleGame.DoSmartTurn(1)
