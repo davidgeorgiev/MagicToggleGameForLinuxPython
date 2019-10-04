@@ -293,40 +293,52 @@ class MagicToggleGame():
 		while(k < self.y):
 			#print("k = "+str(k))
 			while(i < self.x):
-				#print(str(i)+" "+str(k))
+				
 				if(i == x_cp-1 and k == y_cp-1):
-
+					
 					if(self.boardList[k][i] != 0):
 						return 0
 					k_up = k
 					k_down = k
 					i_up = i
 					i_down = i
+					#print(self.boardList[k][i])
+					#print([k_up,k_down,i_up,i_down])
 					if(k+1 < self.y):
 						k_up = k+1
-					if(k-1 > 0):
+					if(k-1 >= 0):
 						k_down = k-1
 					if(i+1 < self.x):
 						i_up = i+1
-					if(i-1 > 0):
+					if(i-1 >= 0):
 						i_down = i-1
+					#print([k_up,k_down,i_up,i_down])
 					if(self.boardList[k_down][i] != 0):
 						flag = 1
+						#print(k_down,i)
 					if(self.boardList[k_up][i] != 0):
 						flag = 1
+						#print(k_up,i)
 					if(self.boardList[k][i_down] != 0):
 						flag = 1
+						#print(k,i_down)
 					if(self.boardList[k][i_up] != 0):
 						flag = 1
+						#print(k,i_up)
 					if(self.boardList[k_up][i_up] != 0):
 						flag = 1
+						#print(k_up,i_up)
 					if(self.boardList[k_down][i_up] != 0):
 						flag = 1
+						#print(k_down,i_up)
 					if(self.boardList[k_down][i_down] != 0):
 						flag = 1
+						#print(k_down,i_down)
 					if(self.boardList[k_up][i_down] != 0):
 						flag = 1
+						#print(k_up,i_down)
 					return flag
+					
 					#print("done")
 				i+=1
 			i=0
