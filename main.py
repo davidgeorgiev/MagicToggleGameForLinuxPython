@@ -1,12 +1,28 @@
 from colorama import init
 init()
 from colorama import Fore, Back, Style
-import msvcrt
 from os import system, name
 import sys, time
 import random
 import copy
 
+import termios, sys, os
+TERMIOS = termios
+ 
+def getkey():
+	fd = sys.stdin.fileno()
+	old = termios.tcgetattr(fd)
+	new = termios.tcgetattr(fd)
+	new[3] = new[3] & ~TERMIOS.ICANON & ~TERMIOS.ECHO
+	new[6][TERMIOS.VMIN] = 1
+	new[6][TERMIOS.VTIME] = 0
+	termios.tcsetattr(fd, TERMIOS.TCSANOW, new)
+	c = None
+	try:
+		c = os.read(fd, 1)
+	finally:
+		termios.tcsetattr(fd, TERMIOS.TCSAFLUSH, old)
+	return c
 class MagicToggleGame():
 	def __init__(self,parent):
 		self.boardList = list()
@@ -52,11 +68,11 @@ class MagicToggleGame():
 	def ShowBoard(self):
 		sys.stdout.write("\033[37m")
 		my_curse3 = "\033[01;99m"
-		my_curse4 = "\033[01;107m"
+		my_curse4 = "\033[01;102m"
 		my_curse1 = Back.BLACK
 		my_curse0 = "\033[01;100m"
 		my_curse00 = "\033[01;47m"
-		system('cls')
+		
 		#for i in range(255):
 		#	sys.stdout.write("\033[30m\033[01;"+str(i)+"m")
 		#	sys.stdout.write(str(i)+",")
@@ -103,9 +119,9 @@ class MagicToggleGame():
 					my_curse2 = my_curse00
 				sys.stdout.write(my_curse2)
 				if(c_x == self.x_cp or c_y == self.y_cp):
-					sys.stdout.write(my_curse4)
-				if(c_x-1 == self.lastX and c_y-1 == self.lastY):
 					sys.stdout.write(my_curse1)
+				if(c_x-1 == self.lastX and c_y-1 == self.lastY):
+					sys.stdout.write(my_curse4)
 				if(k!=0):
 					sys.stdout.write("@")
 				else:
@@ -128,8 +144,8 @@ class MagicToggleGame():
 		#print(self.GetAllAvailablePositions())
 		#print("last turn score is "+str(self.last_turn_score))
 		score = self.CountObjectsOnBoard()
-		sys.stdout.write("\n\033[31m"+"   @: "+str(score[0])+" "+"\033[34m"+"@: "+str(score[1])+"\033[30m\n\n")
-		sys.stdout.write("\n quit by pressing ctrl + c")
+		sys.stdout.write("\n\033[31m"+"   @: "+str(score[0])+" "+"\033[34m"+"@: "+str(score[1])+"\033[30m\n")
+		sys.stdout.write("quit by pressing ctrl + c")
 	def SetCurrentPos(self,player_num):
 		return self.SetPos(player_num,self.x_cp,self.y_cp)
 	def SetPos(self,player_num,x_cp,y_cp):
@@ -524,7 +540,7 @@ class MagicToggleGame():
 
 if __name__ == "__main__":
 	MyMagicToggleGame = MagicToggleGame(None)
-	system('cls')
+	
 	#MyMagicToggleGame.InitBoard()
 	while(1):
 		y_size = raw_input("enter y size of the game field - min:8, max:16 - ")
@@ -543,41 +559,40 @@ if __name__ == "__main__":
 				break
 		except:
 			a=0
-	system("cls")
-	print("\n  Game just started,\n\n controls: arows(up,down,right,left) and \"+\" button\n\n I hope you will enjoy!")
+	
+	print("\n  Game just started,\n\n controls: numpad(8,5,4,6) and \"enter\" button\n\n I hope you will enjoy!")
 	MyMagicToggleGame.gamemode = 2
 	while True:
-		if msvcrt.kbhit():
-			key = msvcrt.getch()
-			if key == "H":
-				#print("Move up")
-				MyMagicToggleGame.DecCurY()
-				MyMagicToggleGame.ShowBoard()
-			if key == "P":
-				#print("Move down")
-				MyMagicToggleGame.IncCurY()
-				MyMagicToggleGame.ShowBoard()
-			if key == "K":
-				#print("Move left")
-				MyMagicToggleGame.DecCurX()
-				MyMagicToggleGame.ShowBoard()
-			if key == "M":
-				#print("Move right")
-				MyMagicToggleGame.IncCurX()
-				MyMagicToggleGame.ShowBoard()
+		key = str(getkey())
+		if key == "8":
+			#print("Move up")
+			MyMagicToggleGame.DecCurY()
+			MyMagicToggleGame.ShowBoard()
+		if key == "5":
+			#print("Move down")
+			MyMagicToggleGame.IncCurY()
+			MyMagicToggleGame.ShowBoard()
+		if key == "4":
+			#print("Move left")
+			MyMagicToggleGame.DecCurX()
+			MyMagicToggleGame.ShowBoard()
+		if key == "6":
+			#print("Move right")
+			MyMagicToggleGame.IncCurX()
+			MyMagicToggleGame.ShowBoard()
 
-			if key == "+":
+		if key == "\n":
+			#other
+			a = 0
+			if(MyMagicToggleGame.SetCurrentPos(1)==1):
+				if(MyMagicToggleGame.gamemode == 2):
+					MyMagicToggleGame.DoSmartTurn(2)
+				MyMagicToggleGame.ShowBoard()
+		if(MyMagicToggleGame.gamemode == 1):
+			if key == "-":
 				#other
 				a = 0
-				if(MyMagicToggleGame.SetCurrentPos(1)==1):
+				if(MyMagicToggleGame.SetCurrentPos(2)==1):
 					if(MyMagicToggleGame.gamemode == 2):
-						MyMagicToggleGame.DoSmartTurn(2)
+						MyMagicToggleGame.DoSmartTurn(1)
 					MyMagicToggleGame.ShowBoard()
-			if(MyMagicToggleGame.gamemode == 1):
-				if key == "-":
-					#other
-					a = 0
-					if(MyMagicToggleGame.SetCurrentPos(2)==1):
-						if(MyMagicToggleGame.gamemode == 2):
-							MyMagicToggleGame.DoSmartTurn(1)
-						MyMagicToggleGame.ShowBoard()
