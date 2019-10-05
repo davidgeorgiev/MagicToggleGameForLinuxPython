@@ -208,7 +208,7 @@ class MagicToggleGame():
 		rand_choice = random.choice(my_list)
 		self.SetPos(player_num,rand_choice[0],rand_choice[1])
 		#print(player_num,rand_choice[0],rand_choice[1])
-	def DoSmartTurn(self,player_num):
+	def FindAVGOfMyScoreInFuture(self,player_num):
 		list_pos_and_score = list()
 		my_list = self.GetAllAvailablePositions()
 		if(len(my_list)==0):
@@ -228,8 +228,37 @@ class MagicToggleGame():
 			list_pos_and_score.append([pos[0],pos[1],self.last_turn_score])
 			self.boardList = copy.deepcopy(last_board_state)
 			#self.ShowBoard()
+		sum_score = 0
+		for item in list_pos_and_score:
+			sum_score += item[2]
+		return sum_score/len(my_list)
+
+	def DoSmartTurn(self,player_num):
+		list_pos_and_score = list()
+		my_list = self.GetAllAvailablePositions()
+		if(len(my_list)==0):
+			return 0
+		random.shuffle(my_list)
+		last_board_state = copy.deepcopy(self.boardList)
+		max_score = 0
+		best_pos_index = 0
+		i = 0
+		future_score = 0
+		for pos in my_list:
+			self.fast_or_not = 1
+			self.SetPos(player_num,pos[0],pos[1])
+			if(self.last_turn_score > max_score):
+				best_pos_index = i
+				max_score = self.last_turn_score
+			i+=1
+			temp_last_turn_score = self.last_turn_score
+			future_score = self.FindAVGOfMyScoreInFuture(player_num)
+			list_pos_and_score.append([pos[0],pos[1],temp_last_turn_score+future_score])
+			self.boardList = copy.deepcopy(last_board_state)
+			#self.ShowBoard()
 
 		list_pos_and_score.sort(key=lambda x: x[2])
+		#print(list_pos_and_score)
 		#for i in list_pos_and_score:
 		#	print(i)
 		#string = raw_input("Enter new Note ")
