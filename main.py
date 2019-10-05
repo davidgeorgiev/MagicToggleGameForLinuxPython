@@ -5,6 +5,7 @@ from os import system, name
 import sys, time
 import random
 import copy
+import webbrowser
 
 import termios, sys, os
 TERMIOS = termios
@@ -78,6 +79,9 @@ class MagicToggleGame():
 					full = 0
 		return full
 	def ShowBoard(self):
+		spriteanim_list2 = ['3','4','5','6','7','8']
+		f = open("index.html", "w")
+		f.write('<style>.img-wrap > img {opacity: 0.5;}</style><script>function timedRefresh(timeoutPeriod) {setTimeout("location.reload(true);",timeoutPeriod);}window.onload = timedRefresh(300);</script>')
 		score = [0,0]
 		sys.stdout.write("\033[37m")
 		my_curse3 = "\033[01;99m"
@@ -116,6 +120,7 @@ class MagicToggleGame():
 		c_x = 1
 		c_y = 1
 		my_bool = 0
+		stones_counter = 0
 		for i in self.boardList:
 			sys.stdout.write("   ")
 			sys.stdout.write(my_curse4)
@@ -124,6 +129,9 @@ class MagicToggleGame():
 			my_curse2 = ""
 			my_bool = not my_bool
 			for k in i:
+				spriteanim_list = ['1','2']
+				random.shuffle(spriteanim_list)
+				
 				#print(k),
 				if k == 1:
 					sys.stdout.write("\033[31m")
@@ -138,21 +146,33 @@ class MagicToggleGame():
 				sys.stdout.write(my_curse2)
 				if(c_x == self.x_cp or c_y == self.y_cp):
 					sys.stdout.write(my_curse1)
+				if(c_x == self.x_cp and c_y == self.y_cp):
+					f.write('<span class="img-wrap">')
 				if(c_x-1 == self.lastX and c_y-1 == self.lastY):
 					sys.stdout.write(my_curse4)
 				if(k==1):
+					f.write('<img src="1-'+spriteanim_list[0]+'.png">')
 					sys.stdout.write(unichr(234))#9672 9642 9899
 				elif(k==2):
+					f.write('<img src="2-'+spriteanim_list[1]+'.png">')
 					sys.stdout.write(unichr(212))
+
 				else:
+					f.write('<img src="'+spriteanim_list2[stones_counter]+'.png">')
 					sys.stdout.write(" ")
+				if(c_x == self.x_cp and c_y == self.y_cp):
+					f.write('</span>')
 				sys.stdout.write(my_curse1)
 				c_x += 1
+				stones_counter+=1
+				if(stones_counter == len(spriteanim_list2)):
+					stones_counter=0
 			c_x = 1
 			sys.stdout.write(my_curse4)
 			sys.stdout.write(" ")
 			sys.stdout.write(my_curse1)
-			print("")
+			f.write('<br>')
+			print("")			
 			c_y += 1
 		sys.stdout.write("   ")
 		sys.stdout.write(my_curse4)
@@ -176,6 +196,7 @@ class MagicToggleGame():
 		score = self.CountObjectsOnBoard()
 		sys.stdout.write("\n\033[31m"+"   "+unichr(234)+": "+str(score[0])+" "+"\033[34m"+unichr(212)+": "+str(score[1])+"\033[37m\n")
 		#sys.stdout.write("\nquit by pressing ctrl + c")
+		f.close()
 	def SetCurrentPos(self,player_num):
 		return self.SetPos(player_num,self.x_cp,self.y_cp)
 	def SetPos(self,player_num,x_cp,y_cp):
@@ -919,6 +940,8 @@ if __name__ == "__main__":
 				player_switcher = not player_switcher
 			if(player_switcher == 1):
 				if(MyMagicToggleGame.SetCurrentPos(1)==1):
+					MyMagicToggleGame.ShowBoard()
+					time.sleep(.300)
 					if(MyMagicToggleGame.gamemode == 2):
 						MyMagicToggleGame.DoSmartTurn(2)
 					MyMagicToggleGame.ShowBoard()
@@ -927,6 +950,8 @@ if __name__ == "__main__":
 					if_succsessfuly_put = 0
 			if(player_switcher == 0):
 				if(MyMagicToggleGame.SetCurrentPos(2)==1):
+					MyMagicToggleGame.ShowBoard()
+					time.sleep(.300)
 					if(MyMagicToggleGame.gamemode == 2):
 						MyMagicToggleGame.DoSmartTurn(1)
 					MyMagicToggleGame.ShowBoard()
