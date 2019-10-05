@@ -8,7 +8,7 @@ import copy
 
 import termios, sys, os
 TERMIOS = termios
- 
+ #Colors for game #C6BEA7,#8C8771,#CF542F,#CC0000,#1D4D95,#350000,#003F07,#C4A000
 def getkey():
 	fd = sys.stdin.fileno()
 	old = termios.tcgetattr(fd)
@@ -140,8 +140,10 @@ class MagicToggleGame():
 					sys.stdout.write(my_curse1)
 				if(c_x-1 == self.lastX and c_y-1 == self.lastY):
 					sys.stdout.write(my_curse4)
-				if(k!=0):
-					sys.stdout.write("@")
+				if(k==1):
+					sys.stdout.write(unichr(234))#9672 9642 9899
+				elif(k==2):
+					sys.stdout.write(unichr(212))
 				else:
 					sys.stdout.write(" ")
 				sys.stdout.write(my_curse1)
@@ -172,7 +174,7 @@ class MagicToggleGame():
 		#print(self.GetAllAvailablePositions())
 		#print("last turn score is "+str(self.last_turn_score))
 		score = self.CountObjectsOnBoard()
-		sys.stdout.write("\n\033[31m"+"   @: "+str(score[0])+" "+"\033[34m"+"@: "+str(score[1])+"\033[37m\n")
+		sys.stdout.write("\n\033[31m"+"   "+unichr(234)+": "+str(score[0])+" "+"\033[34m"+unichr(212)+": "+str(score[1])+"\033[37m\n")
 		#sys.stdout.write("\nquit by pressing ctrl + c")
 	def SetCurrentPos(self,player_num):
 		return self.SetPos(player_num,self.x_cp,self.y_cp)
@@ -209,6 +211,8 @@ class MagicToggleGame():
 	def DoSmartTurn(self,player_num):
 		list_pos_and_score = list()
 		my_list = self.GetAllAvailablePositions()
+		if(len(my_list)==0):
+			return 0
 		random.shuffle(my_list)
 		last_board_state = copy.deepcopy(self.boardList)
 		max_score = 0
@@ -803,9 +807,14 @@ class GameMenu():
 		return self.current_index+1
 
 if __name__ == "__main__":
-	
-	
-
+	'''k = 0
+	for i in range(100000):
+		if(k%100 == 1):
+			key = str(getkey())
+		print(str(i)+": "),
+		print(unichr(i))
+		k+=1
+	'''
 	
 
 	#MyMagicToggleGame.InitBoard()
