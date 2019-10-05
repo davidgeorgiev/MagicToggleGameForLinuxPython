@@ -260,12 +260,12 @@ class MagicToggleGame():
 			#print(list_pos_and_score[j-1])
 			#string = raw_input("Enter new Note ")
 		if(self.game_level == 3):
+			self.SetPos(player_num,list_pos_and_score[-1][0],list_pos_and_score[-1][1])
+		if(self.game_level == 4):
 			if(chance_list[0]==0):
 				self.SetPos(player_num,list_pos_and_score[-1][0],list_pos_and_score[-1][1])
 			else:
-				self.SetPos(player_num,list_pos_and_score[j-1][0],list_pos_and_score[j-1][1])
-		if(self.game_level == 4):
-			self.SetPos(player_num,list_pos_and_score[-1][0],list_pos_and_score[-1][1])
+				self.SetPos(player_num,list_pos_and_score[0][0],list_pos_and_score[0][1])
 		#print(max_score)
 		#print(player_num,my_list[best_pos_index][0],my_list[best_pos_index][1])
 		#string = raw_input("Enter new Note ")
