@@ -585,6 +585,7 @@ class GameMenu():
 	def __init__(self,parent):
 		self.parent = parent
 		self.list_of_modes = [" MULTIPLAYER ","     CPU     "]
+		self.list_of_players = ["\033[31m    FIRE     \033[37m","\033[34m    WATER    \033[37m"]
 		self.list_of_sizes = ["      04     ","      06     ","      08     ","      10     ","      12     ","      14     ","      16     "]
 		self.list_of_levels = ["     EASY    ","    NORMAL   ","     HARD    ","  IMPOSIBLE  "]
 		self.current_index = 0
@@ -633,6 +634,56 @@ class GameMenu():
 			sys.stdout.write(self.my_curse1)
 			sys.stdout.write("\n")
 			for item in self.list_of_modes:
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse4)
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse1)
+				if(i == self.current_index):
+					sys.stdout.write(self.my_curse6)
+				sys.stdout.write(item)
+				i+=1
+				sys.stdout.write(self.my_curse4)
+				sys.stdout.write(" ")
+				sys.stdout.write(self.my_curse1)
+				sys.stdout.write("\n")
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write("               ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n")
+			if key == "\n":
+				break
+			sys.stdout.write("\n\n\n\n\n")
+		return self.current_index+1
+	def ShowSelectPlayer(self,title1,title2):
+		
+		sys.stdout.write(self.my_curse1)
+		sys.stdout.write(self.my_curse3)
+		sys.stdout.write("\033[37m")
+		self.current_index = 0
+		first_time = 1
+		key = ""
+		while True:
+			if(first_time == 0):
+				key = str(getkey())
+			else:
+				first_time = 0
+			if key == "8":
+				#print("Move up")
+				self.DecIndex()
+				first_time = 0
+			if key == "5":
+				#print("Move down")
+				
+				self.IncIndex(len(self.list_of_players)-1)
+			sys.stdout.write(title1+"\n"+title2+"\n")
+			i = 0
+			sys.stdout.write(" ")
+			sys.stdout.write(self.my_curse4)
+			sys.stdout.write("               ")
+			sys.stdout.write(self.my_curse1)
+			sys.stdout.write("\n")
+			for item in self.list_of_players:
 				sys.stdout.write(" ")
 				sys.stdout.write(self.my_curse4)
 				sys.stdout.write(" ")
@@ -796,11 +847,17 @@ if __name__ == "__main__":
 			MyMagicToggleGame.gamemode = int(MyGameMenu.ShowModeMenu("\n\n\n\n\n\n\n\n\n\n\n\n  MAGIC TOGGLE","\n  select mode\n\n"))
 			if(MyMagicToggleGame.gamemode == 2):
 				MyMagicToggleGame.game_level = int(MyGameMenu.ShowLevelsMenu("\n\n\n\n\n\n\n\n\n\n\n\n  MAGIC TOGGLE","\n  select level\n\n"))
+				chosen_to_be_first = 1+int(MyGameMenu.ShowSelectPlayer("\n\n\n\n\n\n\n\n\n\n\n\n  MAGIC TOGGLE","\n  select mode\n\n"))
 			first_time = 0
 			player_switcher = 0
 			key = "8"
-			chosen_to_be_first = 1
 			if_succsessfuly_put = 1
+			if(MyMagicToggleGame.gamemode == 2):
+				player_switcher = not chosen_to_be_first%2
+				if(player_switcher == 0):
+					MyMagicToggleGame.DoSmartTurn(1)
+					MyMagicToggleGame.ShowBoard()
+					key = "1"
 		if key == "8":
 			#print("Move up")
 			MyMagicToggleGame.DecCurY()
@@ -822,8 +879,6 @@ if __name__ == "__main__":
 		if key == "\n":
 			if(MyMagicToggleGame.gamemode == 1 and if_succsessfuly_put == 1):
 				player_switcher = not player_switcher
-			if(MyMagicToggleGame.gamemode == 2):
-				player_switcher = chosen_to_be_first
 			if(player_switcher == 1):
 				if(MyMagicToggleGame.SetCurrentPos(1)==1):
 					if(MyMagicToggleGame.gamemode == 2):
@@ -832,7 +887,7 @@ if __name__ == "__main__":
 					if_succsessfuly_put = 1
 				else:
 					if_succsessfuly_put = 0
-			else:
+			if(player_switcher == 0):
 				if(MyMagicToggleGame.SetCurrentPos(2)==1):
 					if(MyMagicToggleGame.gamemode == 2):
 						MyMagicToggleGame.DoSmartTurn(1)
