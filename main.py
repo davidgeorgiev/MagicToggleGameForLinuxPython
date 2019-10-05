@@ -800,6 +800,7 @@ if __name__ == "__main__":
 			player_switcher = 0
 			key = "8"
 			chosen_to_be_first = 1
+			if_succsessfuly_put = 1
 		if key == "8":
 			#print("Move up")
 			MyMagicToggleGame.DecCurY()
@@ -819,7 +820,7 @@ if __name__ == "__main__":
 		if key == "0":
 			first_time = 1
 		if key == "\n":
-			if(MyMagicToggleGame.gamemode == 1):
+			if(MyMagicToggleGame.gamemode == 1 and if_succsessfuly_put == 1):
 				player_switcher = not player_switcher
 			if(MyMagicToggleGame.gamemode == 2):
 				player_switcher = chosen_to_be_first
@@ -828,8 +829,14 @@ if __name__ == "__main__":
 					if(MyMagicToggleGame.gamemode == 2):
 						MyMagicToggleGame.DoSmartTurn(2)
 					MyMagicToggleGame.ShowBoard()
+					if_succsessfuly_put = 1
+				else:
+					if_succsessfuly_put = 0
 			else:
 				if(MyMagicToggleGame.SetCurrentPos(2)==1):
 					if(MyMagicToggleGame.gamemode == 2):
 						MyMagicToggleGame.DoSmartTurn(1)
 					MyMagicToggleGame.ShowBoard()
+					if_succsessfuly_put = 1
+				else:
+					if_succsessfuly_put = 0
